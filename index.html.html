@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI学習リスト — 太陽の読書管理</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Syne:wght@400;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --surface2: #1a1a1a;
+    --border: #222222;
+    --border2: #2e2e2e;
+    --text: #f0ede8;
+    --text-muted: #666;
+    --text-dim: #444;
+    --accent: #e8d5a3;
+    --accent2: #7eb8a0;
+    --tag-claude: #3a5a8a;
+    --tag-claude-text: #a8c8f0;
+    --tag-ai: #3a5a3a;
+    --tag-ai-text: #a0c8a0;
+    --tag-biz: #6a4a2a;
+    --tag-biz-text: #e0b878;
+    --done-opacity: 0.35;
+    --radius: 6px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* HEADER */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 2rem 2.5rem;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+  .header-left h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.6rem;
+    letter-spacing: -0.02em;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 0.3rem;
+  }
+  .header-left p {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .header-stats {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-end;
+  }
+  .stat-item { text-align: right; }
+  .stat-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 2rem;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .stat-item.accent .stat-num { color: var(--accent2); }
+
+  /* PROGRESS BAR */
+  .progress-wrap {
+    padding: 0.75rem 2.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+  }
+  .progress-bar {
+    flex: 1;
+    height: 2px;
+    background: var(--border2);
+    border-radius: 1px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent2);
+    border-radius: 1px;
+    transition: width 0.5s ease;
+  }
+  .progress-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    min-width: 3rem;
+    text-align: right;
+  }
+
+  /* TABS + FILTERS */
+  .controls {
+    padding: 1rem 2.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .tabs { display: flex; gap: 0; }
+  .tab {
+    padding: 0.4rem 1.1rem;
+    border: 1px solid var(--border2);
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-family: 'Noto Sans JP', sans-serif;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.03em;
+  }
+  .tab:first-child { border-radius: var(--radius) 0 0 var(--radius); }
+  .tab:last-child { border-radius: 0 var(--radius) var(--radius) 0; border-left: none; }
+  .tab:not(:first-child):not(:last-child) { border-left: none; }
+  .tab.active { background: var(--surface2); color: var(--text); border-color: var(--border2); }
+  .tab:hover:not(.active) { color: var(--text); }
+
+  .filters { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .filter-btn {
+    padding: 0.3rem 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    font-family: 'Noto Sans JP', sans-serif;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.03em;
+  }
+  .filter-btn.active { border-color: var(--accent); color: var(--accent); }
+  .filter-btn:hover:not(.active) { border-color: var(--border2); color: var(--text); }
+
+  /* MAIN LAYOUT */
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 0;
+    min-height: calc(100vh - 200px);
+  }
+
+  /* LIST VIEW */
+  #view-list { padding: 1.5rem 2.5rem; }
+  #view-schedule { padding: 1.5rem 2.5rem; display: none; }
+
+  .card-list { display: flex; flex-direction: column; gap: 0; }
+
+  .card {
+    padding: 1.1rem 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: 1.2rem;
+    transition: all 0.2s;
+    cursor: default;
+  }
+  .card:hover { background: rgba(255,255,255,0.015); margin: 0 -1rem; padding-left: 1rem; padding-right: 1rem; }
+  .card.done { opacity: var(--done-opacity); }
+
+  .card-index {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    min-width: 1.5rem;
+    padding-top: 0.15rem;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .card-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 0.55rem;
+  }
+  .dot-high { background: #e06060; }
+  .dot-mid { background: #d4a84b; }
+  .dot-low { background: #5a8a6a; }
+
+  .card-body { flex: 1; min-width: 0; }
+  .card-tag {
+    display: inline-block;
+    font-size: 0.62rem;
+    padding: 0.1rem 0.5rem;
+    border-radius: 3px;
+    margin-bottom: 0.35rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .tag-claude { background: var(--tag-claude); color: var(--tag-claude-text); }
+  .tag-ai { background: var(--tag-ai); color: var(--tag-ai-text); }
+  .tag-biz { background: var(--tag-biz); color: var(--tag-biz-text); }
+
+  .card-title {
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: var(--text);
+    line-height: 1.5;
+    margin-bottom: 0.3rem;
+  }
+  .card.done .card-title { text-decoration: line-through; }
+  .card-meta {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .card-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+  }
+  .btn-open, .btn-done {
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    background: transparent;
+    font-size: 0.68rem;
+    font-family: 'Noto Sans JP', sans-serif;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .btn-open { color: var(--text-muted); }
+  .btn-open:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-done { color: var(--text-muted); }
+  .btn-done:hover { border-color: var(--accent2); color: var(--accent2); }
+  .btn-done.is-done { color: var(--accent2); border-color: var(--accent2); background: rgba(126,184,160,0.08); }
+
+  /* SIDEBAR */
+  .sidebar {
+    border-left: 1px solid var(--border);
+    padding: 1.5rem 1.5rem;
+    position: sticky;
+    top: 0;
+    align-self: start;
+  }
+  .sidebar-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+    margin-bottom: 1rem;
+  }
+  .week-day {
+    margin-bottom: 1.2rem;
+  }
+  .week-day-label {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 0.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .week-day-label span {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--text-dim);
+  }
+  .week-item {
+    font-size: 0.68rem;
+    color: var(--text-dim);
+    padding: 0.25rem 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .week-item:last-child { border-bottom: none; }
+  .week-item.done-item { color: var(--text-dim); }
+  .week-item .check { color: var(--accent2); font-size: 0.6rem; }
+  .week-item .mins { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: var(--text-dim); flex-shrink: 0; }
+
+  /* SCHEDULE VIEW */
+  .schedule-grid { display: grid; gap: 1.5rem; }
+  .sched-block {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .sched-header {
+    padding: 0.75rem 1rem;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .sched-day { font-size: 0.8rem; font-weight: 500; color: var(--text); }
+  .sched-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+  }
+  .sched-progress {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--text-dim);
+  }
+  .sched-row {
+    padding: 0.65rem 1rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    transition: background 0.1s;
+  }
+  .sched-row:last-child { border-bottom: none; }
+  .sched-row:hover { background: rgba(255,255,255,0.02); }
+  .sched-row.done-row { color: var(--text-dim); }
+  .sched-row .sched-check { color: var(--accent2); font-size: 0.65rem; min-width: 1rem; }
+  .sched-row .sched-num { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: var(--text-dim); min-width: 1.2rem; }
+  .sched-row .sched-title { flex: 1; line-height: 1.4; }
+  .sched-row.done-row .sched-title { text-decoration: line-through; }
+  .sched-row .sched-est { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: var(--text-dim); }
+
+  .empty-state { padding: 3rem; text-align: center; color: var(--text-dim); font-size: 0.8rem; }
+
+  @media (max-width: 768px) {
+    .main { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    header { padding: 1.5rem; }
+    #view-list, #view-schedule { padding: 1rem 1.5rem; }
+    .controls { padding: 0.75rem 1.5rem; }
+    .progress-wrap { padding: 0.75rem 1.5rem; }
+    .header-stats { gap: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>AI READING LIST</h1>
+    <p>太陽の学習スケジュール管理</p>
+  </div>
+  <div class="header-stats">
+    <div class="stat-item">
+      <div class="stat-num" id="s-total">20</div>
+      <div class="stat-label">Total</div>
+    </div>
+    <div class="stat-item accent">
+      <div class="stat-num" id="s-done">0</div>
+      <div class="stat-label">Done</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" id="s-pct">0%</div>
+      <div class="stat-label">Progress</div>
+    </div>
+  </div>
+</header>
+
+<div class="progress-wrap">
+  <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+  <div class="progress-label" id="progress-label">0 / 20</div>
+</div>
+
+<div class="controls">
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('list',this)">リスト</button>
+    <button class="tab" onclick="switchTab('schedule',this)">週次</button>
+  </div>
+  <div class="filters" id="filters">
+    <button class="filter-btn active" onclick="setFilter('all',this)">すべて</button>
+    <button class="filter-btn" onclick="setFilter('未読',this)">未読</button>
+    <button class="filter-btn" onclick="setFilter('読了',this)">読了</button>
+    <button class="filter-btn" onclick="setFilter('Claude Code',this)">Claude Code</button>
+    <button class="filter-btn" onclick="setFilter('AIエンジニア',this)">AIエンジニア</button>
+    <button class="filter-btn" onclick="setFilter('ビジネス活用',this)">ビジネス</button>
+  </div>
+</div>
+
+<div class="main">
+  <div>
+    <div id="view-list"><div class="card-list" id="card-list"></div></div>
+    <div id="view-schedule"><div class="schedule-grid" id="schedule-grid"></div></div>
+  </div>
+  <div class="sidebar">
+    <div class="sidebar-title">週次スケジュール</div>
+    <div id="sidebar-weeks"></div>
+  </div>
+</div>
+
+<script>
+const ITEMS = [
+  {id:1,title:"Claude Codeで脳とコードを直結 — アイデアからプロトタイプを即座に大量生成",url:"https://x.com/takejune/status/2024108126279274612",tag:"Claude Code",priority:"high",day:"月",est:15},
+  {id:2,title:"Claude Codeで速く作る全手法 — パターン→プロトタイプ→spec→QAまで一気通貫",url:"https://x.com/ktknd/status/2032241815773130954",tag:"Claude Code",priority:"high",day:"月",est:15},
+  {id:3,title:"スタッフ0人の税理士がClaude Codeで顧問先60社を1人で回している全手法",url:"https://x.com/kandmybike/status/2032817897119096855",tag:"ビジネス活用",priority:"high",day:"火",est:20},
+  {id:4,title:"I want to become a Claude architect（フルコース）",url:"https://x.com/hooeem/status/2033198345045336559",tag:"Claude Code",priority:"high",day:"火",est:20},
+  {id:5,title:"6ヶ月でAI Engineerになる方法 — 年収3000万円プレイヤーへの道",url:"https://x.com/shimayus/status/2033879536199471618",tag:"AIエンジニア",priority:"high",day:"水",est:20},
+  {id:6,title:"AIエージェント実装・業務効率化の実践手法",url:"https://x.com/l_go_mrk/status/2033500775692021866",tag:"AIエンジニア",priority:"mid",day:"水",est:15},
+  {id:7,title:"AI活用で人生を変える実践ノート",url:"https://x.com/shiro_life0/status/2034466595595256130",tag:"AIエンジニア",priority:"mid",day:"木",est:15},
+  {id:8,title:"AIで稼ぐための具体的な行動計画",url:"https://x.com/ysk_motoyama/status/2034769651511828793",tag:"ビジネス活用",priority:"mid",day:"木",est:15},
+  {id:9,title:"AI×副業で月収アップを実現するロードマップ",url:"https://x.com/aiaircle34052/status/2034887669637951800",tag:"ビジネス活用",priority:"mid",day:"金",est:15},
+  {id:10,title:"AIエージェント実装 応用編",url:"https://x.com/l_go_mrk/status/2035207423804445024",tag:"AIエンジニア",priority:"mid",day:"金",est:15},
+  {id:11,title:"ChatGPT・Claude活用で差がつく仕事術",url:"https://x.com/kimura_0314/status/2035005102512374048",tag:"AIエンジニア",priority:"low",day:"土",est:20},
+  {id:12,title:"AIで情報発信を加速する方法",url:"https://x.com/sora19ai/status/2035540279898607881",tag:"ビジネス活用",priority:"low",day:"土",est:15},
+  {id:13,title:"時短・効率化のためのAI自動化術",url:"https://x.com/ai_jitan/status/2035564408387383787",tag:"ビジネス活用",priority:"low",day:"土",est:15},
+  {id:14,title:"フリーランスがAIで仕組みを作る全手順",url:"https://x.com/daifukujinji/status/2035937511776887205",tag:"ビジネス活用",priority:"low",day:"土",est:20},
+  {id:15,title:"AI発信で注目される投稿設計の考え方",url:"https://x.com/sora19ai/status/2036068436099649980",tag:"ビジネス活用",priority:"low",day:"日",est:15},
+  {id:16,title:"占い×AIで独自ビジネスを構築する発想法",url:"https://x.com/supisama_uranai/status/2036460679503511629",tag:"ビジネス活用",priority:"low",day:"日",est:10},
+  {id:17,title:"副業・個人事業主のためのAI活用ガイド",url:"https://x.com/seiji070720/status/2036352341016740298",tag:"ビジネス活用",priority:"low",day:"日",est:10},
+  {id:18,title:"AIで「凍結」を笑い飛ばす思考法とツール",url:"https://x.com/touketsu_warau/status/2036637547972235757",tag:"AIエンジニア",priority:"low",day:"日",est:10},
+  {id:19,title:"AI時代の個人ブランディング完全ガイド",url:"https://x.com/kkk_cun/status/2037073945921544415",tag:"ビジネス活用",priority:"low",day:"日",est:10},
+  {id:20,title:"メルカリ式 AI活用で収益を最大化する方法",url:"https://x.com/mercarioji/status/2037121785087537256",tag:"ビジネス活用",priority:"low",day:"日",est:10},
+];
+
+const SCHEDULE = [
+  {day:"月", label:"月曜 朝", time:"7:00〜7:15", items:[1,2]},
+  {day:"火", label:"火曜 朝", time:"7:00〜7:20", items:[3,4]},
+  {day:"水", label:"水曜 朝", time:"7:00〜7:15", items:[5,6]},
+  {day:"木", label:"木曜 朝", time:"7:00〜7:15", items:[7,8]},
+  {day:"金", label:"金曜 朝", time:"7:00〜7:15", items:[9,10]},
+  {day:"土", label:"土曜 まとめ読み", time:"10:00〜11:10", items:[11,12,13,14]},
+  {day:"日", label:"日曜 振り返り", time:"10:00〜10:45", items:[15,16,17,18,19,20]},
+];
+
+const TCLASS = {"Claude Code":"tag-claude","AIエンジニア":"tag-ai","ビジネス活用":"tag-biz"};
+
+let done = [];
+try { done = JSON.parse(localStorage.getItem('taiyo_rl_done') || '[]'); } catch(e){}
+let currentFilter = 'all';
+let currentTab = 'list';
+
+function save() { try { localStorage.setItem('taiyo_rl_done', JSON.stringify(done)); } catch(e){} }
+
+function toggleDone(id) {
+  if (done.includes(id)) done = done.filter(d => d !== id);
+  else done.push(id);
+  save();
+  renderAll();
+}
+
+function renderStats() {
+  const d = done.length, t = ITEMS.length;
+  const pct = Math.round(d / t * 100);
+  document.getElementById('s-total').textContent = t;
+  document.getElementById('s-done').textContent = d;
+  document.getElementById('s-pct').textContent = pct + '%';
+  document.getElementById('progress').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = d + ' / ' + t;
+}
+
+function renderCards() {
+  let items = ITEMS;
+  if (currentFilter === '未読') items = items.filter(i => !done.includes(i.id));
+  else if (currentFilter === '読了') items = items.filter(i => done.includes(i.id));
+  else if (currentFilter !== 'all') items = items.filter(i => i.tag === currentFilter);
+
+  if (!items.length) {
+    document.getElementById('card-list').innerHTML = '<div class="empty-state">該当なし</div>';
+    return;
+  }
+  document.getElementById('card-list').innerHTML = items.map(item => {
+    const isDone = done.includes(item.id);
+    const dotClass = item.priority === 'high' ? 'dot-high' : item.priority === 'mid' ? 'dot-mid' : 'dot-low';
+    return `<div class="card ${isDone ? 'done' : ''}">
+      <div class="card-index">${String(item.id).padStart(2,'0')}</div>
+      <div class="card-dot ${dotClass}"></div>
+      <div class="card-body">
+        <div class="card-tag ${TCLASS[item.tag]||'tag-biz'}">${item.tag}</div>
+        <div class="card-title">${item.title}</div>
+        <div class="card-meta">${item.day}曜 · ${item.est}min</div>
+      </div>
+      <div class="card-actions">
+        <button class="btn-open" onclick="window.open('${item.url}','_blank')">開く ↗</button>
+        <button class="btn-done ${isDone?'is-done':''}" onclick="toggleDone(${item.id})">${isDone ? '✓ 読了' : '読了'}</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderSchedule() {
+  document.getElementById('schedule-grid').innerHTML = SCHEDULE.map(s => {
+    const doneIn = s.items.filter(id => done.includes(id)).length;
+    const rows = s.items.map(id => {
+      const item = ITEMS.find(i => i.id === id);
+      const isDone = done.includes(id);
+      return `<div class="sched-row ${isDone?'done-row':''}">
+        <span class="sched-check">${isDone?'✓':''}</span>
+        <span class="sched-num">${String(id).padStart(2,'0')}</span>
+        <span class="sched-title">${item.title}</span>
+        <span class="sched-est">${item.est}m</span>
+      </div>`;
+    }).join('');
+    return `<div class="sched-block">
+      <div class="sched-header">
+        <div class="sched-day">${s.label}</div>
+        <div style="display:flex;gap:1rem;align-items:center">
+          <div class="sched-time">${s.time}</div>
+          <div class="sched-progress">${doneIn}/${s.items.length}</div>
+        </div>
+      </div>
+      ${rows}
+    </div>`;
+  }).join('');
+}
+
+function renderSidebar() {
+  document.getElementById('sidebar-weeks').innerHTML = SCHEDULE.map(s => {
+    const doneIn = s.items.filter(id => done.includes(id)).length;
+    const items = s.items.map(id => {
+      const item = ITEMS.find(i => i.id === id);
+      const isDone = done.includes(id);
+      return `<div class="week-item ${isDone?'done-item':''}">
+        <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${item.title.slice(0,22)}…</span>
+        ${isDone ? '<span class="check">✓</span>' : `<span class="mins">${item.est}m</span>`}
+      </div>`;
+    }).join('');
+    return `<div class="week-day">
+      <div class="week-day-label">${s.label} <span>${doneIn}/${s.items.length}</span></div>
+      ${items}
+    </div>`;
+  }).join('');
+}
+
+function renderAll() { renderStats(); renderCards(); renderSchedule(); renderSidebar(); }
+
+function switchTab(tab, el) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('view-list').style.display = tab === 'list' ? '' : 'none';
+  document.getElementById('view-schedule').style.display = tab === 'schedule' ? '' : 'none';
+  document.getElementById('filters').style.visibility = tab === 'list' ? 'visible' : 'hidden';
+}
+
+function setFilter(f, el) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderCards();
+}
+
+renderAll();
+</script>
+</body>
+</html>
