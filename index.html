@@ -3,300 +3,1040 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI学習リスト</title>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#f0f4ff">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="AI読書">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<title>SALES EVENT PORTAL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --glass: rgba(255,255,255,0.65);
-    --glass-border: rgba(255,255,255,0.8);
-    --glass-shadow: 0 8px 32px rgba(100,120,220,0.1);
-    --text: #1a1a2e;
-    --text-muted: #6b7280;
-    --text-light: #9ca3af;
-    --accent: #6366f1;
-    --accent-light: #e0e7ff;
-    --green: #10b981;
-    --green-light: #d1fae5;
-    --radius-sm: 12px;
-    --radius: 18px;
-    --radius-lg: 24px;
+    --bg: #f7f7f7;
+    --surface: #ffffff;
+    --surface2: #f0f0f0;
+    --border: rgba(0,0,0,0.09);
+    --text: #1a1a1a;
+    --muted: #9a9a9a;
+    --accent: #e53935;
+    --accent2: #ff5252;
+    --docomo: #e53935;
+    --au: #f57c00;
+    --softbank: #1565c0;
+    --uq: #2e7d32;
+    --ymobile: #7b1fa2;
+    --green: #00a86b;
+    --yellow: #c8000a;
+    --radius: 14px;
+    --nav-h: 64px;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { height:100%; }
   body {
-    background: linear-gradient(135deg, #e8eeff 0%, #f5e8ff 100%);
-    background-attachment: fixed;
-    color: var(--text);
     font-family: 'Noto Sans JP', sans-serif;
-    font-weight: 300;
+    background: var(--bg);
+    color: var(--text);
     min-height: 100vh;
-    padding-bottom: 3rem;
+    overflow-x: hidden;
   }
-  .blob-wrap { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
-  .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.35; }
-  .blob-1 { width: 400px; height: 400px; background: #818cf8; top: -100px; right: -80px; }
-  .blob-2 { width: 300px; height: 300px; background: #c084fc; bottom: 100px; left: -60px; }
-  .blob-3 { width: 200px; height: 200px; background: #34d399; top: 50%; right: 10%; }
-  .container { max-width: 760px; margin: 0 auto; padding: 0 1.25rem; position: relative; z-index: 1; }
 
-  /* HEADER */
-  header { padding: 2.5rem 0 1.25rem; }
-  .header-inner {
-    background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border); border-radius: var(--radius-lg);
-    padding: 1.75rem 2rem; box-shadow: var(--glass-shadow);
+  /* ======= BOTTOM NAV ======= */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: var(--nav-h);
+    background: rgba(255,255,255,0.96);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(0,0,0,0.08);
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.06);
+    display: flex;
+    z-index: 100;
   }
-  .header-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
-  .header-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 1.6rem; color: var(--text); line-height: 1.2; }
-  .header-title span { color: var(--accent); }
-  .header-sub { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.25rem; }
-  .stat-chips { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-  .chip { display: flex; align-items: center; gap: 0.4rem; background: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.9); border-radius: 100px; padding: 0.35rem 0.9rem; font-size: 0.75rem; font-weight: 500; color: var(--text); }
-  .chip-dot { width: 7px; height: 7px; border-radius: 50%; }
-  .chip-total .chip-dot { background: var(--accent); }
-  .chip-done .chip-dot { background: var(--green); }
-  .chip-pct .chip-dot { background: #f59e0b; }
-  .progress-section { margin-top: 1rem; }
-  .progress-label-row { display: flex; justify-content: space-between; margin-bottom: 0.5rem; }
-  .progress-label { font-size: 0.72rem; color: var(--text-muted); }
-  .progress-pct { font-size: 0.72rem; font-weight: 600; color: var(--accent); }
-  .progress-track { height: 6px; background: rgba(99,102,241,0.15); border-radius: 3px; overflow: hidden; }
-  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), #a78bfa); border-radius: 3px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
-
-  /* TABS */
-  .tab-section { margin: 1.25rem 0 0.75rem; }
-  .tab-row { display: flex; gap: 0.4rem; background: var(--glass); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--glass-border); border-radius: var(--radius); padding: 0.35rem; box-shadow: var(--glass-shadow); width: fit-content; }
-  .tab { padding: 0.5rem 1.25rem; border-radius: var(--radius-sm); border: none; background: transparent; font-size: 0.8rem; font-family: 'Noto Sans JP', sans-serif; color: var(--text-muted); cursor: pointer; transition: all 0.2s; }
-  .tab.active { background: white; color: var(--accent); font-weight: 500; box-shadow: 0 2px 8px rgba(99,102,241,0.15); }
-
-  /* FILTERS */
-  .filter-row { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1rem; }
-  .filter-btn { padding: 0.35rem 0.9rem; border-radius: 100px; border: 1.5px solid rgba(99,102,241,0.2); background: rgba(255,255,255,0.6); font-size: 0.72rem; font-family: 'Noto Sans JP', sans-serif; color: var(--text-muted); cursor: pointer; transition: all 0.2s; }
-  .filter-btn.active { border-color: var(--accent); background: var(--accent-light); color: var(--accent); font-weight: 500; }
-  .filter-btn:hover:not(.active) { border-color: rgba(99,102,241,0.4); color: var(--text); }
-
-  /* CARDS */
-  .card-list { display: flex; flex-direction: column; gap: 0.75rem; }
-  .card { background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: var(--radius); padding: 1.1rem 1.25rem; box-shadow: var(--glass-shadow); display: flex; align-items: flex-start; gap: 1rem; transition: all 0.25s cubic-bezier(0.4,0,0.2,1); }
-  .card:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(100,120,220,0.15); }
-  .card.done { opacity: 0.45; }
-  .priority-bar { width: 4px; min-height: 40px; border-radius: 4px; flex-shrink: 0; align-self: stretch; }
-  .p-high { background: linear-gradient(180deg, #ef4444, #f97316); }
-  .p-mid { background: linear-gradient(180deg, #f59e0b, #fbbf24); }
-  .p-low { background: linear-gradient(180deg, #10b981, #34d399); }
-  .card-body { flex: 1; min-width: 0; }
-  .tag-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem; }
-  .tag { display: inline-block; font-size: 0.62rem; padding: 0.15rem 0.6rem; border-radius: 100px; font-weight: 500; }
-  .tag-claude { background: #e0e7ff; color: #4338ca; }
-  .tag-ai { background: #d1fae5; color: #065f46; }
-  .tag-biz { background: #fef3c7; color: #92400e; }
-  .day-badge { font-size: 0.6rem; padding: 0.15rem 0.5rem; border-radius: 100px; background: rgba(99,102,241,0.1); color: var(--accent); font-weight: 500; }
-  .card-title { font-size: 0.855rem; font-weight: 400; color: var(--text); line-height: 1.55; margin-bottom: 0.3rem; }
-  .card.done .card-title { text-decoration: line-through; color: var(--text-muted); }
-  .card-meta { font-size: 0.68rem; color: var(--text-light); }
-  .card-actions { display: flex; flex-direction: column; gap: 0.4rem; flex-shrink: 0; }
-  .btn { padding: 0.35rem 0.85rem; border-radius: var(--radius-sm); border: 1.5px solid rgba(99,102,241,0.25); background: rgba(255,255,255,0.7); font-size: 0.68rem; font-family: 'Noto Sans JP', sans-serif; cursor: pointer; transition: all 0.18s; white-space: nowrap; color: var(--text-muted); }
-  .btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
-  .btn-done-active { background: var(--green-light) !important; border-color: var(--green) !important; color: var(--green) !important; font-weight: 500; }
-
-  /* SCHEDULE */
-  .schedule-grid { display: flex; flex-direction: column; gap: 0.75rem; }
-  .sched-card { background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--glass-shadow); }
-  .sched-head { padding: 0.9rem 1.25rem; display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.5); border-bottom: 1px solid rgba(255,255,255,0.6); }
-  .sched-day-name { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 0.85rem; color: var(--text); }
-  .sched-meta { display: flex; gap: 0.5rem; align-items: center; }
-  .sched-time { font-size: 0.68rem; color: var(--text-muted); }
-  .sched-count { font-size: 0.65rem; padding: 0.15rem 0.5rem; border-radius: 100px; background: var(--accent-light); color: var(--accent); font-weight: 500; }
-  .sched-row { padding: 0.7rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.5); display: flex; align-items: center; gap: 0.75rem; font-size: 0.78rem; color: var(--text-muted); }
-  .sched-row:last-child { border-bottom: none; }
-  .sched-row.done-row { color: var(--text-light); }
-  .sched-row.done-row .sched-title { text-decoration: line-through; }
-  .sched-check { color: var(--green); font-size: 0.7rem; min-width: 14px; }
-  .sched-title { flex: 1; line-height: 1.4; }
-  .sched-est { font-size: 0.65rem; color: var(--text-light); flex-shrink: 0; }
-  .empty-state { text-align: center; padding: 3rem; color: var(--text-muted); font-size: 0.85rem; }
-
-  @media (max-width: 600px) {
-    .header-inner { padding: 1.25rem; }
-    .header-title { font-size: 1.3rem; }
-    .card { padding: 0.9rem 1rem; }
-    .card-actions { flex-direction: row; }
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: all .2s;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: .04em;
+    position: relative;
   }
+  .nav-item.active { color: var(--accent); }
+  .nav-item.active::before {
+    content:'';
+    position:absolute; top:-1px; left:25%; right:25%;
+    height: 2px;
+    background: var(--accent);
+    border-radius: 0 0 4px 4px;
+  }
+  .nav-icon { font-size: 20px; line-height:1; }
+
+  /* ======= PAGES ======= */
+  .page { display:none; padding: 20px 16px calc(var(--nav-h) + 20px); max-width: 600px; margin: 0 auto; }
+  .page.active { display:block; }
+
+  /* ======= PAGE HEADER ======= */
+  .page-header { margin-bottom: 24px; }
+  .page-header h1 {
+    font-size: 22px; font-weight: 900;
+    letter-spacing: -.03em; color: var(--text);
+  }
+  .page-header p { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+  /* ======= CARDS ======= */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+
+  /* ======= BADGE ======= */
+  .badge {
+    display: inline-flex; align-items: center;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: .04em;
+  }
+  .badge-green { background: rgba(0,201,122,.15); color: var(--green); }
+  .badge-yellow { background: rgba(255,214,46,.12); color: var(--yellow); }
+  .badge-red { background: rgba(255,92,138,.12); color: var(--accent2); }
+  .badge-muted { background: rgba(107,107,138,.15); color: var(--muted); }
+  .badge-accent { background: rgba(229,57,53,.15); color: var(--accent); }
+
+  /* ======= BUTTONS ======= */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-family: inherit; font-size: 14px; font-weight: 700;
+    cursor: pointer; border: none; transition: all .2s;
+    text-decoration: none;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #6a4ae0; transform: translateY(-1px); }
+  .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:hover { background: var(--surface); }
+  .btn-line { background: #06C755; color: #fff; }
+  .btn-line:hover { background: #04a844; }
+  .btn-block { width: 100%; }
+  .btn-sm { padding: 8px 14px; font-size: 12px; }
+
+  /* ======= HOME ======= */
+  .home-greeting { margin-bottom: 24px; }
+  .home-greeting .date { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+  .home-greeting h2 { font-size: 24px; font-weight: 900; color: var(--text); }
+  .home-greeting h2 span { color: var(--accent); }
+
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+  }
+  .stat-label { font-size: 11px; color: var(--muted); font-weight: 500; margin-bottom: 8px; }
+  .stat-value { font-family: 'Space Mono', monospace; font-size: 28px; font-weight: 700; color: var(--text); line-height: 1; }
+  .stat-value small { font-size: 14px; color: var(--muted); }
+  .stat-sub { font-size: 11px; color: var(--muted); margin-top: 6px; }
+  .stat-up { color: var(--green); }
+  .stat-card.highlight {
+    background: linear-gradient(135deg, rgba(229,57,53,.1), rgba(229,57,53,.03));
+    border-color: rgba(229,57,53,.25);
+    grid-column: span 2;
+  }
+  .stat-card.highlight .stat-value { font-size: 36px; color: var(--accent); }
+
+  .section-title {
+    font-size: 12px; font-weight: 700; color: var(--muted);
+    letter-spacing: .1em; text-transform: uppercase;
+    margin-bottom: 12px; margin-top: 24px;
+  }
+
+  /* ======= JOB CARDS ======= */
+  .carrier-bar { height: 4px; border-radius: 4px 4px 0 0; margin: -18px -18px 16px; }
+  .job-card { cursor: pointer; transition: all .2s; }
+  .job-card:hover { transform: translateY(-2px); border-color: rgba(255,255,255,.15); }
+  .job-card.full { opacity: .45; pointer-events: none; }
+  .job-meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
+  .carrier-tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 8px; border-radius: 6px;
+    font-size: 11px; font-weight: 700;
+    background: rgba(255,255,255,.06);
+  }
+  .job-station { font-size: 20px; font-weight: 900; color: var(--text); margin-bottom: 4px; }
+  .job-store { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+  .job-info-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
+  .job-info-item { font-size: 13px; }
+  .job-info-item span { color: var(--muted); font-size: 11px; display: block; margin-bottom: 2px; }
+  .job-price { font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 700; color: var(--yellow); }
+
+  .filter-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 16px; scrollbar-width: none; }
+  .filter-bar::-webkit-scrollbar { display: none; }
+  .filter-btn {
+    flex-shrink: 0;
+    padding: 7px 14px; border-radius: 100px;
+    font-family: inherit; font-size: 12px; font-weight: 700;
+    cursor: pointer; border: 1px solid var(--border);
+    background: var(--surface); color: var(--muted);
+    transition: all .2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  /* ======= MODAL ======= */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.8);
+    backdrop-filter: blur(8px);
+    z-index: 200;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-sheet {
+    background: var(--surface);
+    border-radius: 20px 20px 0 0;
+    padding: 24px 20px 40px;
+    width: 100%; max-width: 600px;
+    animation: slideUp .25s ease;
+    max-height: 90vh; overflow-y: auto;
+  }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 4px; margin: 0 auto 20px; }
+  .modal-carrier-bar { height: 3px; border-radius: 3px; margin-bottom: 16px; }
+  .modal-title { font-size: 22px; font-weight: 900; color: var(--text); margin-bottom: 4px; }
+  .modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+  .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+  .modal-item label { font-size: 11px; color: var(--muted); display: block; margin-bottom: 4px; }
+  .modal-item .value { font-size: 15px; font-weight: 500; }
+  .modal-price-big {
+    font-family: 'Space Mono', monospace;
+    font-size: 32px; font-weight: 700; color: var(--accent);
+    margin-bottom: 20px;
+  }
+  .modal-price-big span { font-size: 14px; color: var(--muted); }
+
+  /* ======= APPLY MANAGEMENT ======= */
+  .apply-card { display: flex; gap: 14px; align-items: flex-start; }
+  .apply-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+  }
+  .apply-info h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .apply-info p { font-size: 12px; color: var(--muted); }
+  .apply-status { margin-left: auto; flex-shrink: 0; }
+
+  /* ======= TRANSPORT FORM ======= */
+  .form-group { margin-bottom: 16px; }
+  .form-label { font-size: 12px; font-weight: 700; color: var(--muted); display: block; margin-bottom: 8px; letter-spacing: .05em; }
+  .form-input {
+    width: 100%; padding: 12px 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text); font-family: inherit; font-size: 14px;
+    transition: all .2s;
+    outline: none;
+  }
+  .form-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(229,57,53,.15); }
+  select.form-input { cursor: pointer; }
+  .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .transport-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--border); }
+  .transport-item:last-child { border-bottom: none; }
+  .transport-info h4 { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+  .transport-info p { font-size: 12px; color: var(--muted); }
+  .transport-amount { font-family: 'Space Mono', monospace; font-size: 16px; font-weight: 700; color: var(--green); }
+  .transport-status { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+
+  /* ======= SALARY CALC ======= */
+  .calc-display {
+    background: linear-gradient(135deg, rgba(229,57,53,.08), rgba(229,57,53,.02));
+    border: 1px solid rgba(229,57,53,.2);
+    border-radius: var(--radius);
+    padding: 24px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .calc-display .result-label { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+  .calc-display .result-value {
+    font-family: 'Space Mono', monospace;
+    font-size: 40px; font-weight: 700; color: var(--text);
+    line-height: 1;
+  }
+  .calc-display .result-value span { font-size: 20px; color: var(--muted); }
+  .calc-breakdown { margin-top: 16px; }
+  .calc-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .calc-row:last-child { border-bottom: none; font-weight: 700; }
+  .calc-row .label { color: var(--muted); }
+  .calc-row .amount { font-family: 'Space Mono', monospace; color: var(--text); }
+  .calc-row.total .amount { color: var(--yellow); font-size: 15px; }
+
+  .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .toggle-label { font-size: 13px; }
+  .toggle { position: relative; width: 44px; height: 24px; }
+  .toggle input { display: none; }
+  .toggle-track {
+    position: absolute; inset: 0;
+    background: var(--surface2);
+    border-radius: 100px;
+    cursor: pointer;
+    transition: .2s;
+    border: 1px solid var(--border);
+  }
+  .toggle-track::after {
+    content:'';
+    position: absolute;
+    left: 3px; top: 3px;
+    width: 16px; height: 16px;
+    background: var(--muted);
+    border-radius: 50%;
+    transition: .2s;
+  }
+  .toggle input:checked + .toggle-track { background: var(--accent); border-color: var(--accent); }
+  .toggle input:checked + .toggle-track::after { transform: translateX(20px); background: #fff; }
+
+  /* ======= HISTORY ======= */
+  .history-month-label {
+    font-size: 11px; font-weight: 700; color: var(--muted);
+    letter-spacing: .1em; text-transform: uppercase;
+    padding: 8px 0; margin-top: 8px;
+  }
+  .history-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 0; border-bottom: 1px solid var(--border);
+  }
+  .history-item:last-child { border-bottom: none; }
+  .history-info h4 { font-size: 14px; font-weight: 600; }
+  .history-info p { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .history-amount { text-align: right; }
+  .history-amount .amount { font-family: 'Space Mono', monospace; font-size: 16px; font-weight: 700; color: var(--text); }
+  .history-amount .days { font-size: 11px; color: var(--muted); }
+
+  /* ======= EMPTY STATE ======= */
+  .empty { text-align: center; padding: 48px 0; }
+  .empty .icon { font-size: 48px; margin-bottom: 16px; opacity: .4; }
+  .empty h3 { font-size: 16px; font-weight: 700; color: var(--muted); margin-bottom: 8px; }
+  .empty p { font-size: 13px; color: var(--muted); opacity: .7; }
+
+  /* ======= NOTIFICATION DOT ======= */
+  .nav-dot {
+    position: absolute; top: 8px; right: calc(50% - 14px);
+    width: 7px; height: 7px;
+    background: var(--accent);
+    border-radius: 50%;
+    border: 2px solid var(--bg);
+  }
+
+  /* ======= MISC ======= */
+  .divider { height: 1px; background: var(--border); margin: 16px 0; }
+  .text-muted { color: var(--muted); }
+  .monospace { font-family: 'Space Mono', monospace; }
+  .flex-between { display: flex; justify-content: space-between; align-items: center; }
+
+  /* Range input */
+  input[type=range] {
+    width: 100%; height: 4px; border-radius: 4px;
+    background: var(--surface2); outline: none; cursor: pointer;
+    -webkit-appearance: none; accent-color: var(--accent);
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 4px; }
+
+  /* Slide-in anim */
+  @keyframes fadeIn { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform: translateY(0); } }
+  .page.active > * { animation: fadeIn .3s ease both; }
+  .page.active > *:nth-child(2) { animation-delay: .04s; }
+  .page.active > *:nth-child(3) { animation-delay: .08s; }
+  .page.active > *:nth-child(4) { animation-delay: .12s; }
+
+  .toast {
+    position: fixed; bottom: calc(var(--nav-h) + 16px); left: 50%; transform: translateX(-50%);
+    background: #1a1a1a; color: #fff; border: none;
+    border-radius: 100px; padding: 10px 20px;
+    font-size: 13px; font-weight: 700;
+    z-index: 300; pointer-events: none;
+    animation: toastAnim 2.5s ease forwards;
+    white-space: nowrap;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  }
+  @keyframes toastAnim { 0%{opacity:0;transform:translateX(-50%) translateY(10px)} 15%{opacity:1;transform:translateX(-50%) translateY(0)} 75%{opacity:1} 100%{opacity:0;transform:translateX(-50%) translateY(-10px)} }
 </style>
 </head>
 <body>
 
-<div class="blob-wrap">
-  <div class="blob blob-1"></div>
-  <div class="blob blob-2"></div>
-  <div class="blob blob-3"></div>
+<!-- ====== PAGE: HOME ====== -->
+<div class="page active" id="page-home">
+  <div class="home-greeting">
+    <div class="date" id="today-date"></div>
+    <h2>おはようございます、<br><span id="user-name">スタッフ</span>さん 👋</h2>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card highlight">
+      <div class="stat-label">今月の予想報酬</div>
+      <div class="stat-value" id="home-monthly-salary">¥0<small></small></div>
+      <div class="stat-sub" id="home-salary-sub">稼働データを入力してください</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">今月の稼働日数</div>
+      <div class="stat-value" id="home-days">0<small> 日</small></div>
+      <div class="stat-sub stat-up" id="home-days-sub">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">交通費（申請済）</div>
+      <div class="stat-value" id="home-transport">¥0</div>
+      <div class="stat-sub" id="home-transport-sub">—</div>
+    </div>
+  </div>
+
+  <div class="section-title">🔥 新着案件</div>
+  <div id="home-jobs-preview"></div>
+  <button class="btn btn-secondary btn-block" onclick="switchPage('page-jobs')" style="margin-bottom:16px;">
+    すべての案件を見る →
+  </button>
+
+  <div class="section-title">📌 応募中の案件</div>
+  <div id="home-applied-preview"></div>
 </div>
 
-<div class="container">
-  <header>
-    <div class="header-inner">
-      <div class="header-top">
-        <div>
-          <div class="header-title">AI<span>学習</span>リスト</div>
-          <div class="header-sub">太陽のスケジュール管理 · 全20本</div>
-        </div>
-        <div class="stat-chips">
-          <div class="chip chip-total"><div class="chip-dot"></div><span id="s-total">20</span> 本</div>
-          <div class="chip chip-done"><div class="chip-dot"></div><span id="s-done">0</span> 読了</div>
-          <div class="chip chip-pct"><div class="chip-dot"></div><span id="s-pct">0%</span></div>
-        </div>
-      </div>
-      <div class="progress-section">
-        <div class="progress-label-row">
-          <span class="progress-label">進捗</span>
-          <span class="progress-pct" id="s-pct2">0 / 20</span>
-        </div>
-        <div class="progress-track"><div class="progress-fill" id="progress" style="width:0%"></div></div>
-      </div>
-    </div>
-  </header>
+<!-- ====== PAGE: JOBS ====== -->
+<div class="page" id="page-jobs">
+  <div class="page-header">
+    <h1>📋 案件リスト</h1>
+    <p>SALES EVENT PORTAL <span id="jobs-count-badge" class="badge badge-accent" style="margin-left:8px;">募集中 0件</span></p>
+  </div>
 
-  <div class="tab-section">
-    <div class="tab-row">
-      <button class="tab active" onclick="switchTab('list',this)">リスト</button>
-      <button class="tab" onclick="switchTab('schedule',this)">週次スケジュール</button>
+  <div class="filter-bar" id="filter-bar">
+    <button class="filter-btn active" data-carrier="all" onclick="filterJobs(this)">すべて</button>
+    <button class="filter-btn" data-carrier="docomo" onclick="filterJobs(this)">🍄 docomo</button>
+    <button class="filter-btn" data-carrier="au" onclick="filterJobs(this)">🍊 au</button>
+    <button class="filter-btn" data-carrier="softbank" onclick="filterJobs(this)">⚪ SoftBank</button>
+    <button class="filter-btn" data-carrier="uq" onclick="filterJobs(this)">♕ UQ</button>
+    <button class="filter-btn" data-carrier="ymobile" onclick="filterJobs(this)">🐱 Y!mobile</button>
+  </div>
+
+  <div id="jobs-container"></div>
+</div>
+
+<!-- ====== PAGE: MY PAGE ====== -->
+<div class="page" id="page-mypage">
+  <div class="page-header">
+    <h1>✅ 応募管理</h1>
+    <p>応募中・確定済みの案件を管理</p>
+  </div>
+
+  <div id="applied-list"></div>
+</div>
+
+<!-- ====== PAGE: TRANSPORT ====== -->
+<div class="page" id="page-transport">
+  <div class="page-header flex-between" style="display:flex; justify-content:space-between; align-items:flex-start;">
+    <div>
+      <h1>🚗 交通費申請</h1>
+      <p>案件ごとの交通費を記録・申請</p>
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="openTransportForm()">＋ 新規申請</button>
+  </div>
+
+  <div class="stats-grid" style="grid-template-columns:1fr 1fr 1fr; margin-bottom:20px;">
+    <div class="stat-card" style="padding:14px;">
+      <div class="stat-label">申請中</div>
+      <div class="stat-value" style="font-size:22px;" id="t-pending-count">0</div>
+    </div>
+    <div class="stat-card" style="padding:14px;">
+      <div class="stat-label">承認済</div>
+      <div class="stat-value" style="font-size:22px; color:var(--green);" id="t-approved-count">0</div>
+    </div>
+    <div class="stat-card" style="padding:14px;">
+      <div class="stat-label">今月合計</div>
+      <div class="stat-value" style="font-size:16px;" id="t-month-total">¥0</div>
     </div>
   </div>
 
-  <div id="view-list">
-    <div class="filter-row">
-      <button class="filter-btn active" onclick="setFilter('all',this)">すべて</button>
-      <button class="filter-btn" onclick="setFilter('未読',this)">未読</button>
-      <button class="filter-btn" onclick="setFilter('読了',this)">読了</button>
-      <button class="filter-btn" onclick="setFilter('Claude Code',this)">Claude Code</button>
-      <button class="filter-btn" onclick="setFilter('AIエンジニア',this)">AIエンジニア</button>
-      <button class="filter-btn" onclick="setFilter('ビジネス活用',this)">ビジネス</button>
-    </div>
-    <div class="card-list" id="card-list"></div>
-  </div>
-
-  <div id="view-schedule" style="display:none">
-    <div class="schedule-grid" id="schedule-grid"></div>
+  <div class="section-title">申請履歴</div>
+  <div class="card" id="transport-list">
+    <div class="empty"><div class="icon">🚃</div><h3>申請がありません</h3><p>「＋ 新規申請」から交通費を申請してください</p></div>
   </div>
 </div>
+
+<!-- ====== PAGE: SALARY ====== -->
+<div class="page" id="page-salary">
+  <div class="page-header">
+    <h1>💰 報酬計算</h1>
+    <p>稼働日数・単価から報酬をシミュレーション</p>
+  </div>
+
+  <div class="calc-display">
+    <div class="result-label">手取り予想額</div>
+    <div class="result-value" id="calc-result">¥<span id="calc-net">0</span></div>
+    <div style="font-size:12px; color:var(--muted); margin-top:8px;" id="calc-gross-label">税引き前: ¥0</div>
+  </div>
+
+  <div class="card">
+    <div class="form-group">
+      <label class="form-label">単価（円/日）</label>
+      <input type="number" class="form-input" id="calc-price" value="27000" min="0" step="1000" oninput="calcSalary()">
+    </div>
+    <div class="form-group">
+      <label class="form-label">稼働日数: <span id="calc-days-label">5</span>日</label>
+      <input type="range" id="calc-days" min="1" max="31" value="5" oninput="calcSalary(); document.getElementById('calc-days-label').textContent=this.value">
+    </div>
+    <div class="form-group">
+      <label class="form-label">交通費（円）</label>
+      <input type="number" class="form-input" id="calc-transport" value="0" min="0" step="500" oninput="calcSalary()">
+    </div>
+    <div class="toggle-row">
+      <div class="toggle-label">源泉徴収を引く（10.21%）</div>
+      <label class="toggle">
+        <input type="checkbox" id="calc-tax" onchange="calcSalary()">
+        <span class="toggle-track"></span>
+      </label>
+    </div>
+    <div class="toggle-row">
+      <div class="toggle-label">交通費を含める</div>
+      <label class="toggle">
+        <input type="checkbox" id="calc-inc-transport" checked onchange="calcSalary()">
+        <span class="toggle-track"></span>
+      </label>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="calc-breakdown" id="calc-breakdown"></div>
+  </div>
+
+  <div class="section-title">📊 稼働履歴</div>
+  <div class="card" id="history-list">
+    <div class="empty"><div class="icon">📅</div><h3>稼働履歴がありません</h3><p>案件に応募・稼働確定すると表示されます</p></div>
+  </div>
+</div>
+
+<!-- ====== JOB MODAL ====== -->
+<div class="modal-overlay" id="job-modal" onclick="closeModal(event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-carrier-bar" id="modal-bar"></div>
+    <div class="modal-title" id="modal-station"></div>
+    <div class="modal-sub" id="modal-store"></div>
+    <div id="modal-tags" style="margin-bottom:16px;"></div>
+    <div class="modal-price-big" id="modal-price"></div>
+    <div class="modal-grid" id="modal-grid"></div>
+    <div style="display:flex; gap:10px; flex-direction:column;" id="modal-actions"></div>
+  </div>
+</div>
+
+<!-- ====== TRANSPORT FORM MODAL ====== -->
+<div class="modal-overlay" id="transport-modal" onclick="closeTransportModal(event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <h2 style="font-size:18px; font-weight:900; margin-bottom:20px;">🚗 交通費申請</h2>
+    <div class="form-group">
+      <label class="form-label">案件名 / 店舗名</label>
+      <input type="text" class="form-input" id="t-job-name" placeholder="例：新潟亀田駅（docomo）">
+    </div>
+    <div class="input-row">
+      <div class="form-group">
+        <label class="form-label">稼働日</label>
+        <input type="date" class="form-input" id="t-date">
+      </div>
+      <div class="form-group">
+        <label class="form-label">金額（円）</label>
+        <input type="number" class="form-input" id="t-amount" placeholder="3200" min="0">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">交通手段</label>
+      <select class="form-input" id="t-method">
+        <option>新幹線</option>
+        <option>電車</option>
+        <option>バス</option>
+        <option>タクシー</option>
+        <option>自家用車</option>
+        <option>高速代</option>
+        <option>その他</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">区間（任意）</label>
+      <input type="text" class="form-input" id="t-route" placeholder="例：渋谷→新潟">
+    </div>
+    <div class="form-group">
+      <label class="form-label">備考（任意）</label>
+      <input type="text" class="form-input" id="t-note" placeholder="領収書No. など">
+    </div>
+    <button class="btn btn-primary btn-block" onclick="submitTransport()">申請する</button>
+    <button class="btn btn-secondary btn-block" style="margin-top:8px;" onclick="document.getElementById('transport-modal').classList.remove('open')">キャンセル</button>
+  </div>
+</div>
+
+<!-- ====== BOTTOM NAV ====== -->
+<nav class="bottom-nav">
+  <div class="nav-item active" id="nav-home" onclick="switchPage('page-home', this)">
+    <div class="nav-icon">🏠</div>
+    <div>ホーム</div>
+  </div>
+  <div class="nav-item" id="nav-jobs" onclick="switchPage('page-jobs', this)">
+    <div class="nav-icon">📋</div>
+    <div>案件</div>
+    <div class="nav-dot" id="jobs-dot" style="display:none;"></div>
+  </div>
+  <div class="nav-item" id="nav-mypage" onclick="switchPage('page-mypage', this)">
+    <div class="nav-icon">✅</div>
+    <div>応募管理</div>
+    <div class="nav-dot" id="apply-dot" style="display:none;"></div>
+  </div>
+  <div class="nav-item" id="nav-transport" onclick="switchPage('page-transport', this)">
+    <div class="nav-icon">🚗</div>
+    <div>交通費</div>
+  </div>
+  <div class="nav-item" id="nav-salary" onclick="switchPage('page-salary', this)">
+    <div class="nav-icon">💰</div>
+    <div>報酬</div>
+  </div>
+</nav>
 
 <script>
-const ITEMS = [
-  {id:1,title:"Claude Codeで脳とコードを直結 — アイデアからプロトタイプを即座に大量生成",url:"https://x.com/takejune/status/2024108126279274612",tag:"Claude Code",priority:"high",day:"月",est:15},
-  {id:2,title:"Claude Codeで速く作る全手法 — パターン→プロトタイプ→spec→QAまで一気通貫",url:"https://x.com/ktknd/status/2032241815773130954",tag:"Claude Code",priority:"high",day:"月",est:15},
-  {id:3,title:"スタッフ0人の税理士がClaude Codeで顧問先60社を1人で回している全手法",url:"https://x.com/kandmybike/status/2032817897119096855",tag:"ビジネス活用",priority:"high",day:"火",est:20},
-  {id:4,title:"I want to become a Claude architect（フルコース）",url:"https://x.com/hooeem/status/2033198345045336559",tag:"Claude Code",priority:"high",day:"火",est:20},
-  {id:5,title:"6ヶ月でAI Engineerになる方法 — 年収3000万円プレイヤーへの道",url:"https://x.com/shimayus/status/2033879536199471618",tag:"AIエンジニア",priority:"high",day:"水",est:20},
-  {id:6,title:"AIエージェント実装・業務効率化の実践手法",url:"https://x.com/l_go_mrk/status/2033500775692021866",tag:"AIエンジニア",priority:"mid",day:"水",est:15},
-  {id:7,title:"AI活用で人生を変える実践ノート",url:"https://x.com/shiro_life0/status/2034466595595256130",tag:"AIエンジニア",priority:"mid",day:"木",est:15},
-  {id:8,title:"AIで稼ぐための具体的な行動計画",url:"https://x.com/ysk_motoyama/status/2034769651511828793",tag:"ビジネス活用",priority:"mid",day:"木",est:15},
-  {id:9,title:"AI×副業で月収アップを実現するロードマップ",url:"https://x.com/aiaircle34052/status/2034887669637951800",tag:"ビジネス活用",priority:"mid",day:"金",est:15},
-  {id:10,title:"AIエージェント実装 応用編",url:"https://x.com/l_go_mrk/status/2035207423804445024",tag:"AIエンジニア",priority:"mid",day:"金",est:15},
-  {id:11,title:"ChatGPT・Claude活用で差がつく仕事術",url:"https://x.com/kimura_0314/status/2035005102512374048",tag:"AIエンジニア",priority:"low",day:"土",est:20},
-  {id:12,title:"AIで情報発信を加速する方法",url:"https://x.com/sora19ai/status/2035540279898607881",tag:"ビジネス活用",priority:"low",day:"土",est:15},
-  {id:13,title:"時短・効率化のためのAI自動化術",url:"https://x.com/ai_jitan/status/2035564408387383787",tag:"ビジネス活用",priority:"low",day:"土",est:15},
-  {id:14,title:"フリーランスがAIで仕組みを作る全手順",url:"https://x.com/daifukujinji/status/2035937511776887205",tag:"ビジネス活用",priority:"low",day:"土",est:20},
-  {id:15,title:"AI発信で注目される投稿設計の考え方",url:"https://x.com/sora19ai/status/2036068436099649980",tag:"ビジネス活用",priority:"low",day:"日",est:15},
-  {id:16,title:"占い×AIで独自ビジネスを構築する発想法",url:"https://x.com/supisama_uranai/status/2036460679503511629",tag:"ビジネス活用",priority:"low",day:"日",est:10},
-  {id:17,title:"副業・個人事業主のためのAI活用ガイド",url:"https://x.com/seiji070720/status/2036352341016740298",tag:"ビジネス活用",priority:"low",day:"日",est:10},
-  {id:18,title:"AIで「凍結」を笑い飛ばす思考法とツール",url:"https://x.com/touketsu_warau/status/2036637547972235757",tag:"AIエンジニア",priority:"low",day:"日",est:10},
-  {id:19,title:"AI時代の個人ブランディング完全ガイド",url:"https://x.com/kkk_cun/status/2037073945921544415",tag:"ビジネス活用",priority:"low",day:"日",est:10},
-  {id:20,title:"メルカリ式 AI活用で収益を最大化する方法",url:"https://x.com/mercarioji/status/2037121785087537256",tag:"ビジネス活用",priority:"low",day:"日",est:10},
-];
-const SCHEDULE = [
-  {day:"月曜",time:"朝 7:00〜7:15",items:[1,2]},
-  {day:"火曜",time:"朝 7:00〜7:20",items:[3,4]},
-  {day:"水曜",time:"朝 7:00〜7:15",items:[5,6]},
-  {day:"木曜",time:"朝 7:00〜7:15",items:[7,8]},
-  {day:"金曜",time:"朝 7:00〜7:15",items:[9,10]},
-  {day:"土曜",time:"まとめ読み 10:00〜11:10",items:[11,12,13,14]},
-  {day:"日曜",time:"振り返り 10:00〜10:45",items:[15,16,17,18,19,20]},
-];
-const TCLASS = {"Claude Code":"tag-claude","AIエンジニア":"tag-ai","ビジネス活用":"tag-biz"};
-const DLABEL = {月:"月曜朝",火:"火曜朝",水:"水曜朝",木:"木曜朝",金:"金曜朝",土:"土曜",日:"日曜"};
+// ======== CONFIG ========
+const LINE_ID = "@xxxxx"; // ★ 自分の公式LINEのIDに書き換える
 
-let done = [];
-try { done = JSON.parse(localStorage.getItem('taiyo_rl2_done') || '[]'); } catch(e){}
-let currentFilter = 'all';
-function save() { try { localStorage.setItem('taiyo_rl2_done', JSON.stringify(done)); } catch(e){} }
-function toggleDone(id) {
-  done = done.includes(id) ? done.filter(d=>d!==id) : [...done, id];
-  save(); renderAll();
+// ======== SAMPLE JOBS DATA ========
+// ★ ここをプロンプト①で生成したJOBSデータに置き換える
+const JOBS = [
+  {
+    id: 1,
+    carrier: "docomo",
+    station: "新潟亀田駅",
+    store: "ドコモショップ亀田店",
+    price: 30000,
+    dates: "4/19(土)〜4/20(日)",
+    transport: "交通費別途支給",
+    lodging: "宿泊費支給あり",
+    position: "クローザー",
+    count: 1,
+    status: "open"
+  },
+  {
+    id: 2,
+    carrier: "au",
+    station: "藤沢駅",
+    store: "auショップ藤沢店",
+    price: 27000,
+    dates: "4/25(金)〜4/27(日)",
+    transport: "交通費込み",
+    lodging: "",
+    position: "クローザー",
+    count: 2,
+    status: "open"
+  },
+  {
+    id: 3,
+    carrier: "softbank",
+    station: "渋谷駅",
+    store: "SoftBank渋谷",
+    price: 28000,
+    dates: "4/26(土)〜4/27(日)",
+    transport: "交通費別途支給",
+    lodging: "",
+    position: "オープナー",
+    count: 1,
+    status: "full"
+  },
+  {
+    id: 4,
+    carrier: "uq",
+    station: "梅田駅",
+    store: "UQmobile梅田店",
+    price: 26000,
+    dates: "5/3(土)〜5/6(火)",
+    transport: "交通費込み",
+    lodging: "宿泊費支給あり",
+    position: "クローザー",
+    count: 3,
+    status: "open"
+  },
+  {
+    id: 5,
+    carrier: "ymobile",
+    station: "名古屋駅",
+    store: "Y!mobile名古屋",
+    price: 25000,
+    dates: "5/10(土)〜5/11(日)",
+    transport: "交通費別途支給",
+    lodging: "",
+    position: "クローザー",
+    count: 1,
+    status: "open"
+  }
+];
+
+// ======== CARRIER CONFIG ========
+const CARRIER = {
+  docomo:   { color: "#e53935", emoji: "🍄", label: "docomo" },
+  au:       { color: "#f57c00", emoji: "🍊", label: "au" },
+  softbank: { color: "#1565c0", emoji: "⚪", label: "SoftBank" },
+  uq:       { color: "#2e7d32", emoji: "♕", label: "UQ" },
+  ymobile:  { color: "#7b1fa2", emoji: "🐱", label: "Y!mobile" }
+};
+
+// ======== STATE ========
+let currentFilter = "all";
+let appliedJobs = JSON.parse(localStorage.getItem("applied") || "[]");
+let transports = JSON.parse(localStorage.getItem("transports") || "[]");
+let history = JSON.parse(localStorage.getItem("history") || "[]");
+
+// ======== INIT ========
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("today-date").textContent = new Date().toLocaleDateString("ja-JP", { year:"numeric",month:"long",day:"numeric",weekday:"long" });
+  renderJobs();
+  renderHome();
+  renderApplied();
+  renderTransportList();
+  calcSalary();
+  renderHistory();
+
+  const n = JOBS.filter(j=>j.status==="open").length;
+  if(n > 0) {
+    document.getElementById("jobs-count-badge").textContent = `募集中 ${n}件`;
+    document.getElementById("jobs-dot").style.display = "block";
+  }
+});
+
+// ======== NAV ========
+function switchPage(pageId, navEl) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+  document.getElementById(pageId).classList.add("active");
+  if(navEl) navEl.classList.add("active");
+  else {
+    const map = { "page-home":"nav-home","page-jobs":"nav-jobs","page-mypage":"nav-mypage","page-transport":"nav-transport","page-salary":"nav-salary" };
+    document.getElementById(map[pageId])?.classList.add("active");
+  }
+  window.scrollTo(0,0);
 }
-function renderStats() {
-  const d=done.length, t=ITEMS.length, pct=Math.round(d/t*100);
-  document.getElementById('s-total').textContent=t;
-  document.getElementById('s-done').textContent=d;
-  document.getElementById('s-pct').textContent=pct+'%';
-  document.getElementById('s-pct2').textContent=d+' / '+t;
-  document.getElementById('progress').style.width=pct+'%';
-}
-function renderCards() {
-  let items = ITEMS;
-  if (currentFilter==='未読') items=items.filter(i=>!done.includes(i.id));
-  else if (currentFilter==='読了') items=items.filter(i=>done.includes(i.id));
-  else if (currentFilter!=='all') items=items.filter(i=>i.tag===currentFilter);
-  if (!items.length) { document.getElementById('card-list').innerHTML='<div class="empty-state">該当なし</div>'; return; }
-  document.getElementById('card-list').innerHTML=items.map(item=>{
-    const isDone=done.includes(item.id);
-    return `<div class="card ${isDone?'done':''}">
-      <div class="priority-bar p-${item.priority}"></div>
-      <div class="card-body">
-        <div class="tag-row">
-          <span class="tag ${TCLASS[item.tag]||'tag-biz'}">${item.tag}</span>
-          <span class="day-badge">${DLABEL[item.day]}</span>
-        </div>
-        <div class="card-title">${item.title}</div>
-        <div class="card-meta">目安 ${item.est}分</div>
+
+// ======== JOB RENDERING ========
+function jobCardHTML(job, compact=false) {
+  const c = CARRIER[job.carrier];
+  const isFull = job.status === "full";
+  const isApplied = appliedJobs.includes(job.id);
+  return `
+    <div class="card job-card ${isFull?'full':''}" onclick="${!isFull?`openJobModal(${job.id})`:''}" style="padding-top:22px; cursor:${isFull?'default':'pointer'}">
+      <div class="carrier-bar" style="background:${c.color}; margin-top:-22px; margin-left:-18px; width:calc(100% + 36px); border-radius:14px 14px 0 0;"></div>
+      <div class="job-meta">
+        <span class="carrier-tag">${c.emoji} ${c.label}</span>
+        ${isApplied ? '<span class="badge badge-accent">応募済</span>' : ''}
+        ${isFull ? '<span class="badge badge-muted">満員</span>' : '<span class="badge badge-green">募集中</span>'}
       </div>
-      <div class="card-actions">
-        <button class="btn" onclick="window.open('${item.url}','_blank')">開く ↗</button>
-        <button class="btn ${isDone?'btn-done-active':''}" onclick="toggleDone(${item.id})">${isDone?'✓ 読了':'読了にする'}</button>
+      <div class="job-station">${job.station}</div>
+      <div class="job-store">${job.store}</div>
+      <div class="job-info-row">
+        <div class="job-info-item"><span>単価</span><div class="job-price">¥${job.price.toLocaleString()}<span style="font-size:13px;color:var(--muted)">/日</span></div></div>
+        <div class="job-info-item"><span>日程</span>${job.dates}</div>
+        <div class="job-info-item"><span>ポジション</span>${job.position} ${job.count}名</div>
+      </div>
+      ${!compact ? `<div style="font-size:12px;color:var(--muted);">${job.transport}${job.lodging?' / '+job.lodging:''}</div>` : ''}
+    </div>`;
+}
+
+function renderJobs() {
+  const container = document.getElementById("jobs-container");
+  const filtered = currentFilter==="all" ? JOBS : JOBS.filter(j=>j.carrier===currentFilter);
+  if(!filtered.length) { container.innerHTML = '<div class="empty"><div class="icon">📋</div><h3>案件がありません</h3></div>'; return; }
+  container.innerHTML = filtered.map(j => jobCardHTML(j)).join("");
+}
+
+function filterJobs(btn) {
+  document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  currentFilter = btn.dataset.carrier;
+  renderJobs();
+}
+
+// ======== HOME ========
+function renderHome() {
+  // New jobs preview (top 2 open)
+  const opens = JOBS.filter(j=>j.status==="open").slice(0,2);
+  document.getElementById("home-jobs-preview").innerHTML = opens.length
+    ? opens.map(j=>jobCardHTML(j,true)).join("")
+    : '<div class="empty"><div class="icon">📋</div><h3>新着案件はありません</h3></div>';
+
+  // Applied preview
+  const applied = JOBS.filter(j=>appliedJobs.includes(j.id)).slice(0,2);
+  document.getElementById("home-applied-preview").innerHTML = applied.length
+    ? applied.map(j=>`<div class="card" style="display:flex;gap:12px;align-items:center;cursor:pointer;" onclick="switchPage('page-mypage')">
+        <div style="width:8px;height:48px;border-radius:4px;background:${CARRIER[j.carrier].color};flex-shrink:0;"></div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:15px;font-weight:700;">${j.station}</div>
+          <div style="font-size:12px;color:var(--muted);">${j.dates} · ${j.position}</div>
+        </div>
+        <span class="badge badge-accent">応募済</span>
+      </div>`).join("")
+    : '<div style="padding:12px 0; color:var(--muted); font-size:13px; text-align:center;">まだ応募していません</div>';
+
+  // Stats from transports
+  const thisMonth = new Date().getMonth();
+  const monthT = transports.filter(t=>new Date(t.date).getMonth()===thisMonth);
+  const tTotal = monthT.reduce((s,t)=>s+t.amount,0);
+  document.getElementById("home-transport").textContent = `¥${tTotal.toLocaleString()}`;
+  document.getElementById("home-transport-sub").textContent = monthT.length > 0 ? `${monthT.length}件申請済み` : "申請なし";
+
+  // Salary from history
+  const monthH = history.filter(h=>new Date(h.date).getMonth()===thisMonth);
+  const days = monthH.reduce((s,h)=>s+h.days,0);
+  const gross = monthH.reduce((s,h)=>s+(h.price*h.days),0);
+  document.getElementById("home-days").innerHTML = `${days}<small> 日</small>`;
+  document.getElementById("home-monthly-salary").innerHTML = `¥${gross.toLocaleString()}<small></small>`;
+  document.getElementById("home-salary-sub").textContent = days > 0 ? `${monthH.length}案件 合計${days}日稼働` : "稼働データを入力してください";
+}
+
+// ======== MODAL ========
+function openJobModal(id) {
+  const job = JOBS.find(j=>j.id===id);
+  if(!job) return;
+  const c = CARRIER[job.carrier];
+  const isApplied = appliedJobs.includes(id);
+
+  document.getElementById("modal-bar").style.background = c.color;
+  document.getElementById("modal-station").textContent = job.station;
+  document.getElementById("modal-store").textContent = job.store;
+  document.getElementById("modal-tags").innerHTML = `<span class="carrier-tag">${c.emoji} ${c.label}</span>`;
+  document.getElementById("modal-price").innerHTML = `¥${job.price.toLocaleString()}<span>/日〜</span>`;
+  document.getElementById("modal-grid").innerHTML = `
+    <div class="modal-item"><label>日程</label><div class="value">${job.dates}</div></div>
+    <div class="modal-item"><label>ポジション</label><div class="value">${job.position} ${job.count}名</div></div>
+    <div class="modal-item"><label>交通費</label><div class="value">${job.transport}</div></div>
+    <div class="modal-item"><label>宿泊費</label><div class="value">${job.lodging||"なし"}</div></div>`;
+
+  const msg = encodeURIComponent(`【案件応募】\n📍 ${job.store}（${job.station}）\n📅 ${job.dates}\n👤 ${job.position}\n💰 ${job.price.toLocaleString()}円/日〜\n${job.transport}${job.lodging?' / '+job.lodging:''}\n\n上記案件に応募します。`);
+  const lineUrl = `https://line.me/R/msg/text/?${msg}`;
+
+  document.getElementById("modal-actions").innerHTML = `
+    ${isApplied
+      ? `<button class="btn btn-secondary btn-block" onclick="cancelApply(${id})" style="color:var(--muted)">応募を取り消す</button>`
+      : `<a href="${lineUrl}" target="_blank" class="btn btn-line btn-block" onclick="markApplied(${id})">LINEで応募する 🟢</a>`
+    }
+    <button class="btn btn-secondary btn-block" onclick="addToCalc(${id})">この案件の報酬を計算する ⌗</button>
+    <button class="btn btn-secondary btn-block" style="font-size:12px;padding:10px;" onclick="closeModal()">閉じる</button>`;
+
+  document.getElementById("job-modal").classList.add("open");
+}
+
+function closeModal(e) {
+  if(!e || e.target === document.getElementById("job-modal")) document.getElementById("job-modal").classList.remove("open");
+}
+
+function markApplied(id) {
+  if(!appliedJobs.includes(id)) {
+    appliedJobs.push(id);
+    localStorage.setItem("applied", JSON.stringify(appliedJobs));
+    document.getElementById("apply-dot").style.display = "block";
+    renderApplied();
+    renderHome();
+    setTimeout(() => {
+      document.getElementById("job-modal").classList.remove("open");
+      renderJobs();
+      showToast("✅ 応募済みとしてマークしました");
+    }, 300);
+  }
+}
+
+function cancelApply(id) {
+  appliedJobs = appliedJobs.filter(i=>i!==id);
+  localStorage.setItem("applied", JSON.stringify(appliedJobs));
+  renderApplied();
+  renderHome();
+  renderJobs();
+  document.getElementById("job-modal").classList.remove("open");
+  showToast("応募を取り消しました");
+}
+
+function addToCalc(id) {
+  const job = JOBS.find(j=>j.id===id);
+  if(!job) return;
+  document.getElementById("calc-price").value = job.price;
+  calcSalary();
+  document.getElementById("job-modal").classList.remove("open");
+  switchPage("page-salary");
+  showToast(`💰 ${job.station}の単価をセットしました`);
+}
+
+// ======== APPLIED PAGE ========
+function renderApplied() {
+  const list = document.getElementById("applied-list");
+  const applied = JOBS.filter(j=>appliedJobs.includes(j.id));
+  if(!applied.length) {
+    list.innerHTML = '<div class="empty"><div class="icon">✅</div><h3>応募中の案件はありません</h3><p>案件一覧からLINEで応募してください</p></div>';
+    return;
+  }
+  list.innerHTML = applied.map(j=>{
+    const c = CARRIER[j.carrier];
+    return `<div class="card" style="cursor:pointer;" onclick="openJobModal(${j.id})">
+      <div class="apply-card">
+        <div class="apply-icon" style="background:${c.color}22; color:${c.color}; font-size:22px;">${c.emoji}</div>
+        <div class="apply-info">
+          <h3>${j.station} <span style="font-size:13px;color:var(--muted);">${j.store}</span></h3>
+          <p>${j.dates} · ${j.position} · ¥${j.price.toLocaleString()}/日</p>
+        </div>
+        <div class="apply-status">
+          <span class="badge badge-accent">応募済</span>
+          <button class="btn btn-sm btn-secondary" style="margin-top:8px;" onclick="event.stopPropagation();addToHistory(${j.id})">稼働確定 →</button>
+        </div>
       </div>
     </div>`;
-  }).join('');
+  }).join("");
 }
-function renderSchedule() {
-  document.getElementById('schedule-grid').innerHTML=SCHEDULE.map(s=>{
-    const doneIn=s.items.filter(id=>done.includes(id)).length;
-    const rows=s.items.map(id=>{
-      const item=ITEMS.find(i=>i.id===id), isDone=done.includes(id);
-      return `<div class="sched-row ${isDone?'done-row':''}">
-        <span class="sched-check">${isDone?'✓':''}</span>
-        <span class="sched-title">${item.title}</span>
-        <span class="sched-est">${item.est}分</span>
+
+function addToHistory(id) {
+  const job = JOBS.find(j=>j.id===id);
+  if(!job) return;
+  const days = parseInt(prompt(`「${job.station}」の稼働日数を入力:`, "2") || "0");
+  if(!days || days<=0) return;
+  const entry = { id: Date.now(), jobId: id, station: job.station, carrier: job.carrier, price: job.price, days, date: new Date().toISOString().split("T")[0] };
+  history.push(entry);
+  localStorage.setItem("history", JSON.stringify(history));
+  cancelApply(id);
+  renderHistory();
+  renderHome();
+  showToast(`📊 稼働履歴に追加しました（${days}日）`);
+}
+
+// ======== TRANSPORT ========
+function openTransportForm() {
+  document.getElementById("t-date").value = new Date().toISOString().split("T")[0];
+  document.getElementById("transport-modal").classList.add("open");
+}
+
+function closeTransportModal(e) {
+  if(e.target === document.getElementById("transport-modal")) document.getElementById("transport-modal").classList.remove("open");
+}
+
+function submitTransport() {
+  const name = document.getElementById("t-job-name").value.trim();
+  const date = document.getElementById("t-date").value;
+  const amount = parseInt(document.getElementById("t-amount").value);
+  const method = document.getElementById("t-method").value;
+  const route = document.getElementById("t-route").value.trim();
+  const note = document.getElementById("t-note").value.trim();
+  if(!name || !date || !amount) { alert("案件名、日付、金額は必須です"); return; }
+  transports.push({ id: Date.now(), name, date, amount, method, route, note, status: "pending" });
+  localStorage.setItem("transports", JSON.stringify(transports));
+  document.getElementById("transport-modal").classList.remove("open");
+  renderTransportList();
+  renderHome();
+  showToast("🚗 交通費申請を提出しました");
+}
+
+function renderTransportList() {
+  const list = document.getElementById("transport-list");
+  if(!transports.length) {
+    list.innerHTML = '<div class="empty"><div class="icon">🚃</div><h3>申請がありません</h3><p>「＋ 新規申請」から交通費を申請してください</p></div>';
+    updateTransportStats();
+    return;
+  }
+  const sorted = [...transports].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  list.innerHTML = sorted.map(t=>`
+    <div class="transport-item">
+      <div class="transport-info">
+        <h4>${t.name}</h4>
+        <p>${t.date} · ${t.method}${t.route?' · '+t.route:''}</p>
+        ${t.note?`<p style="color:var(--muted);font-size:11px;">${t.note}</p>`:''}
+      </div>
+      <div class="transport-status">
+        <div class="transport-amount">¥${t.amount.toLocaleString()}</div>
+        <span class="badge ${t.status==='approved'?'badge-green':t.status==='rejected'?'badge-red':'badge-yellow'}">
+          ${t.status==='approved'?'承認済':t.status==='rejected'?'却下':'申請中'}
+        </span>
+      </div>
+    </div>`).join("");
+  updateTransportStats();
+}
+
+function updateTransportStats() {
+  const thisMonth = new Date().getMonth();
+  const pending = transports.filter(t=>t.status==="pending").length;
+  const approved = transports.filter(t=>t.status==="approved").length;
+  const monthTotal = transports.filter(t=>new Date(t.date).getMonth()===thisMonth).reduce((s,t)=>s+t.amount,0);
+  document.getElementById("t-pending-count").textContent = pending;
+  document.getElementById("t-approved-count").textContent = approved;
+  document.getElementById("t-month-total").textContent = `¥${monthTotal.toLocaleString()}`;
+}
+
+// ======== SALARY CALC ========
+function calcSalary() {
+  const price = parseInt(document.getElementById("calc-price").value)||0;
+  const days = parseInt(document.getElementById("calc-days").value)||0;
+  const transport = parseInt(document.getElementById("calc-transport").value)||0;
+  const taxOn = document.getElementById("calc-tax").checked;
+  const incTransport = document.getElementById("calc-inc-transport").checked;
+  const gross = price * days;
+  const tax = taxOn ? Math.floor(gross * 0.1021) : 0;
+  const net = gross - tax + (incTransport ? transport : 0);
+  document.getElementById("calc-net").textContent = net.toLocaleString();
+  document.getElementById("calc-gross-label").textContent = taxOn ? `税引き前: ¥${gross.toLocaleString()} (源泉 -¥${tax.toLocaleString()})` : `源泉徴収なし`;
+  document.getElementById("calc-breakdown").innerHTML = `
+    <div class="calc-row"><span class="label">単価</span><span class="amount">¥${price.toLocaleString()}</span></div>
+    <div class="calc-row"><span class="label">稼働日数</span><span class="amount">${days}日</span></div>
+    <div class="calc-row"><span class="label">稼働報酬（計）</span><span class="amount">¥${gross.toLocaleString()}</span></div>
+    ${taxOn?`<div class="calc-row"><span class="label">源泉徴収（10.21%）</span><span class="amount" style="color:var(--accent2)">-¥${tax.toLocaleString()}</span></div>`:''}
+    ${transport?`<div class="calc-row"><span class="label">交通費</span><span class="amount" style="color:var(--green)">+¥${transport.toLocaleString()}</span></div>`:''}
+    <div class="calc-row total"><span class="label">手取り予想</span><span class="amount">¥${net.toLocaleString()}</span></div>`;
+}
+
+// ======== HISTORY ========
+function renderHistory() {
+  const list = document.getElementById("history-list");
+  if(!history.length) {
+    list.innerHTML = '<div class="empty"><div class="icon">📅</div><h3>稼働履歴がありません</h3><p>応募管理から稼働確定してください</p></div>';
+    return;
+  }
+  const sorted = [...history].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const grouped = {};
+  sorted.forEach(h=>{
+    const d = new Date(h.date);
+    const key = `${d.getFullYear()}年${d.getMonth()+1}月`;
+    (grouped[key]=grouped[key]||[]).push(h);
+  });
+  list.innerHTML = Object.entries(grouped).map(([month,items])=>`
+    <div class="history-month-label">${month}</div>
+    ${items.map(h=>{
+      const c = CARRIER[h.carrier];
+      return `<div class="history-item">
+        <div style="display:flex;gap:12px;align-items:center;">
+          <div style="width:6px;height:40px;border-radius:3px;background:${c.color};flex-shrink:0;"></div>
+          <div class="history-info">
+            <h4>${h.station}</h4>
+            <p>${h.date} · ${h.days}日稼働 · ¥${h.price.toLocaleString()}/日</p>
+          </div>
+        </div>
+        <div class="history-amount">
+          <div class="amount">¥${(h.price*h.days).toLocaleString()}</div>
+          <div class="days">${h.days}日</div>
+        </div>
       </div>`;
-    }).join('');
-    return `<div class="sched-card">
-      <div class="sched-head">
-        <div class="sched-day-name">${s.day}</div>
-        <div class="sched-meta"><span class="sched-time">${s.time}</span><span class="sched-count">${doneIn}/${s.items.length}</span></div>
-      </div>${rows}</div>`;
-  }).join('');
+    }).join('')}
+  `).join('');
 }
-function renderAll() { renderStats(); renderCards(); renderSchedule(); }
-function switchTab(tab,el) {
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('view-list').style.display=tab==='list'?'':'none';
-  document.getElementById('view-schedule').style.display=tab==='schedule'?'':'none';
-}
-function setFilter(f,el) {
-  currentFilter=f;
-  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
-  renderCards();
-}
-renderAll();
-</script>
-<script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/reading-list3/sw.js')
-    .catch(e => console.log('SW error', e));
+
+// ======== TOAST ========
+function showToast(msg) {
+  const t = document.createElement("div");
+  t.className = "toast";
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2600);
 }
 </script>
 </body>
